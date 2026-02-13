@@ -24,8 +24,8 @@ export default defineConfig({
 
   /* Shared settings for all projects */
   use: {
-    /* Base URL for the app - note: app runs on 3001 if 3000 is busy */
-    baseURL: 'http://localhost:3000',
+    /* Base URL for the app */
+    baseURL: 'http://localhost:3001',
 
     /* Collect trace when retrying failed test */
     trace: 'on-first-retry',

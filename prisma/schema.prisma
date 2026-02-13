@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -42,7 +42,7 @@ model Article {
   slug           String         @unique
   title          String
   description    String
-  body           String         @db.Text
+  body           String
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @default(now()) @map("updated_at")
   tags           ArticlesTags[]
@@ -70,7 +70,7 @@ model Comment {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
-  body      String   @db.VarChar(1024)
+  body      String
   article   Article  @relation(fields: [articleId], references: [id])
   articleId Int      @map("article_id")
   author    User     @relation(fields: [authorId], references: [id])
