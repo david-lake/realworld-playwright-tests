@@ -18,7 +18,8 @@
     "paths": {
       "@data/*": ["tests/data/*"],
       "@actions/*": ["tests/actions/*"],
-      "@fixtures/*": ["tests/fixtures/*"]
+      "@fixtures/*": ["tests/fixtures/*"],
+      "@utils/*": ["tests/utils/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

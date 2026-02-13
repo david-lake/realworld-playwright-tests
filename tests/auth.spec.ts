@@ -2,54 +2,55 @@ import { test } from '@fixtures/app.fixture';
 import { expect } from '@playwright/test';
 import { generateUser } from '@data/users';
 
-test('user can login with valid credentials', async ({ app, page }) => {
-  // Generate a unique user
-  const user = generateUser();
+test.describe('Authentication', () => {
+  test('user can login with valid credentials', async ({ app, page, createUser, cleanupUser }) => {
+    // Setup: Create user directly in database
+    const testUser = generateUser();
+    const user = await createUser(testUser);
 
-  // Setup response handler before navigating
-  let signupResponse: any = null;
-  page.on('response', async response => {
-    if (response.url().includes('/api') && response.request().method() === 'POST') {
-      try {
-        signupResponse = await response.json();
-      } catch (e) {
-        // Ignore non-JSON responses
+    // Capture network requests
+    const requests: string[] = [];
+    page.on('request', req => {
+      if (req.url().includes('/api')) {
+        requests.push(req.url());
       }
+    });
+
+    try {
+      // Navigate to login page
+      await app.auth.gotoLogin();
+      await expect(page.getByPlaceholder('Email')).toBeVisible();
+
+      // Login via UI
+      await app.auth.login(user);
+
+      // Wait for login response
+      await page.waitForResponse(res =>
+        res.url().includes('/api') && res.request().method() === 'POST'
+      );
+
+      console.log('Requests after login:', requests);
+      requests.length = 0;
+
+      // Wait for token to be stored
+      await page.waitForFunction(() => {
+        const t = localStorage.getItem('token');
+        return t && t.length > 10;
+      });
+
+      console.log('Token exists, reloading...');
+
+      // Reload the page so Apollo Client picks up the token on init
+      await page.reload();
+      await page.waitForTimeout(3000);
+
+      console.log('Requests after reload:', requests);
+
+      // Verify logged in state
+      await expect(page.getByRole('link', { name: 'Settings' })).toBeVisible();
+    } finally {
+      // Cleanup: Remove test user from database
+      await cleanupUser(user.email);
     }
   });
-
-  // Navigate to register page
-  await page.goto('/register');
-  await expect(page.getByPlaceholder('Username')).toBeVisible();
-
-  // Fill the form
-  await page.getByPlaceholder('Username').fill(user.username);
-  await page.getByPlaceholder('Email').fill(user.email);
-  await page.getByPlaceholder('Password').fill(user.password);
-
-  // Submit form
-  await page.getByRole('button', { name: 'Sign up' }).click();
-
-  // Wait for response to be captured
-  await page.waitForTimeout(2000);
-
-  // Verify signup was successful
-  expect(signupResponse).not.toBeNull();
-  expect(signupResponse.data.signup.token).toBeDefined();
-
-  // Navigate to home page and wait for it to load
-  await page.goto('/');
-  await page.waitForLoadState('networkidle');
-
-  // Debug: check localStorage for token
-  const token = await page.evaluate(() => localStorage.getItem('token'));
-  console.log('Token in localStorage:', token ? 'present' : 'missing');
-
-  // Debug: check what page we're on
-  console.log('Current URL:', page.url());
-  const links = await page.getByRole('link').allTextContents();
-  console.log('Visible links:', links);
-
-  // Verify logged in state by checking for Settings link
-  await expect(page.getByRole('link', { name: 'Settings' })).toBeVisible();
 });
