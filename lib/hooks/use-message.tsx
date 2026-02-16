@@ -93,7 +93,7 @@ function useProvideMessageHandler() {
 
       if (graphQLErrors) {
         for (let err of graphQLErrors) {
-          switch (err.extensions.code) {
+          switch (err.extensions?.code) {
             case ServerErrorCode.Unauthorized:
               if (token) reset(); // invalid token push to login
               break;

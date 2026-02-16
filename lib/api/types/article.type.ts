@@ -42,7 +42,7 @@ const Article = objectType({
             where: { slug },
           })
           .tags({ select: { tag: { select: { name: true } } } });
-        return tags.map((t) => t.tag.name);
+        return tags?.map((t) => t.tag.name) ?? [];
       },
     });
   },
