@@ -4,6 +4,7 @@
   "description": "A fullstack implementation of the RealWorld App using Next.js, Prisma ORM and Apollo GraphQL stack",
   "private": true,
   "scripts": {
+    "postinstall": "patch-package",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
