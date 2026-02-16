@@ -26,11 +26,12 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Enable Corepack
-      run: corepack enable
+    - run: corepack enable
+
+    - run: yarn cache clean
 
     - name: Install dependencies
-      run: yarn install --immutable --mode=skip-build
+      run: yarn install --immutable
       env:
         CI: true
         PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
