@@ -5,11 +5,15 @@ export const TOKEN_ALG = 'RS256';
 export const TOKEN_KID = 'izayoi';
 export const TOKEN_PREFIX = 'Bearer ';
 
-export const PUBLIC_JWK = {
-  kty: 'RSA' as const,
-  n: 'yVR5JoXu-P8gk0MwPB8zNjvwvsBbWyBcV2P6sEjbH_l0uNAqDBcdMvBTeX-14Z_yHwI-YnGdYXKG7BmpF0yFvm0OFEnIdXhX9wMnd18VT42IVdBGAzmP0aLDmgibXb5R7xJYYTIVVhK3gR1ZMlv6c-8_RptxiyfRIiwQ8h7rH2NaePVWrartUGEud1cmc1dRjAIhAtJUBuWJ3XazMWHzEyUQ23QcTsiWsrw3Vb_Ro4JbwUip2SDuWH2BvOmkNY7pCdXaMxVZIMoqLgFOd1Wn32OVWumnN62kYASs99EUFdza_h-CjT2T6dq3T0zW2CgPnxMpphFyZLuePNVV__mTew',
-  e: 'AQAB',
-};
+// PUBLIC_JWK is loaded from environment variable for flexibility across environments
+// In production, this should be set in your deployment environment
+export const PUBLIC_JWK = process.env.PUBLIC_JWK 
+  ? JSON.parse(process.env.PUBLIC_JWK)
+  : {
+      kty: 'RSA' as const,
+      n: 'yVR5JoXu-P8gk0MwPB8zNjvwvsBbWyBcV2P6sEjbH_l0uNAqDBcdMvBTeX-14Z_yHwI-YnGdYXKG7BmpF0yFvm0OFEnIdXhX9wMnd18VT42IVdBGAzmP0aLDmgibXb5R7xJYYTIVVhK3gR1ZMlv6c-8_RptxiyfRIiwQ8h7rH2NaePVWrartUGEud1cmc1dRjAIhAtJUBuWJ3XazMWHzEyUQ23QcTsiWsrw3Vb_Ro4JbwUip2SDuWH2BvOmkNY7pCdXaMxVZIMoqLgFOd1Wn32OVWumnN62kYASs99EUFdza_h-CjT2T6dq3T0zW2CgPnxMpphFyZLuePNVV__mTew',
+      e: 'AQAB',
+    };
 
 /** frontend constants */
 
