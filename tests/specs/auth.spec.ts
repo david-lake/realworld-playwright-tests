@@ -19,8 +19,8 @@ test.describe('Authentication', () => {
   test('user can login with valid credentials', async ({ page }) => {
     const auth = new AuthActions(page);
 
-    // Create test user
-    const hashedPassword = await bcrypt.hash(users.valid.password, 10);
+    // Create test user using same hashing method as the app
+    const hashedPassword = bcrypt.hashSync(users.valid.password, bcrypt.genSaltSync(10));
     await prisma.user.create({
       data: {
         username: users.valid.username,
@@ -31,6 +31,11 @@ test.describe('Authentication', () => {
 
     // Navigate to login and sign in
     await auth.gotoLogin();
+    
+    // Wait for form to be ready
+    await expect(page.getByPlaceholder('Email')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    
     await auth.login(users.valid.email, users.valid.password);
 
     // Wait for navigation and verify successful login
