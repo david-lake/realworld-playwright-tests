@@ -28,8 +28,14 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Enable Corepack
+      run: corepack enable
+
     - name: Install dependencies
       run: yarn install --immutable
+      env:
+        YARN_ENABLE_IMMUTABLE_INSTALLS: true
+        YARN_ENABLE_PROGRESS_BARS: false
 
     - name: Install Playwright browsers
       run: npx playwright install --with-deps chromium
