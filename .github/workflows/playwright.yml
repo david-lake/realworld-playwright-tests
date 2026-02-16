@@ -1,0 +1,87 @@
+name: Playwright Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpass
+          MYSQL_DATABASE: real_blog
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - run: corepack enable
+
+    - name: Install dependencies
+      run: yarn install --immutable
+      env:
+        CI: true
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps chromium
+
+    - name: Setup environment
+      run: |
+        echo "DATABASE_URL=mysql://root:rootpass@localhost:3306/real_blog?useUnicode=true&characterEncoding=utf8&useSSL=false" >> .env
+        echo "PRIVATE_JWK={\"kty\":\"RSA\",\"n\":\"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ\",\"e\":\"AQAB\",\"d\":\"SCVv-bUuujlnPpcHQpnPosLzniFATFm8zelU5l3L1WZBh9w0F5zPZJYE0P8e5X8ur67oDlJM-n--nI-I0yXj2lygY1pC98Q1pRllrt0HsvmindCLvzYz7NW8BsjBKhP4EtvIqLI9fHWeKrjlaDghxoLwNmhqs1DxgOYiqhYQrma2wvMwh6n7J6qRFyxxz3J1wVoSuq4rirVM4BQMA9_qDhHdpttcvf_fkIJ3xAcnFx1dE7brRzukqjlhSUH0VQ1X3GQQwdBYSgdO5Nfg0-SmMr2ctaYOJn9rWQFechatk7EgEcJtL_Lkz-aHy9RE_Kymfyq1wdmu5dwHU0ARfdbqDQ\",\"p\":\"_bRV64t9R_9aiVK1jkBnmRvxy3jOwKCb52V5rg47sF_1FMV4xK5KdyClDNY_Mc0HYwl3OdQcWOhol1qmTiKtXjsMgEzhMCKZr9iXHSX3hckIOI4o0p3yWCM34kyjiHaycRCPL_Q_NGBTp-5qLWJ0dtN2u5uXvI5BKd5aLSPOKFc\",\"q\":\"z5JLq528W1_lSSNFtb03wYpiYMbGlKjbfEOtidesU97n-UjaYh8g2ZeNaLehK_OVRcMdLAs2ohfT8rb5zQakHncVK_bojAgbmYQRwaEgncEcZyKsw03gvNrvePYsG91iSXiXPku_yTeQiM_YYheEQdzWF3y0KLLphdpIM-zd1oM\",\"dp\":\"oYBF3a6rLsTf5mDvUEGxcSb30hXyT28uL6xKPEG1P36mLfXS_ikRICp4xuYvzkz9Mc9ZxUdAUFyKECdVjJHImR6vw5CtHQ45lVYkRBriKZkikZX1aLXBCthIf9dXlswwpYbsD5PFFFtphZJgpslw6B-PCrhubEqGMtfnwap0Vvs\",\"dq\":\"AZSYlObvjzaMtWDaYAbfzM5z7060Jl-exDRzts_4lO7mj0RZvVOFWYLI5do4FPCW22Af8bzoHpXV3Ew-XKxHRaAcfig0HxTUuPeDdxj1-Z2FzNc7v4TxSB7WofIl5dRqsiqD5EqJXEvbAt-qQxzwudunmaguavzpwEYoNJUCH2c\",\"qi\":\"4d-Ct9yJ8SvRldlfeLHvlxIxtjnnMRhc0GPitnxpquWnTBEnNt7AHdtpn2vR7C4GB0pRpmrPw99MgQK92vcanAZlELvz5uH77-w909YpxJuYU7wyo7s9GXeU7HYk7ShKLUWYx9eynnKKlYo-sF_LVqsIspyvGOCzxYchEN6YlKQ\"}" >> .env
+        echo "PUBLIC_JWK={\"kty\":\"RSA\",\"n\":\"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ\",\"e\":\"AQAB\"}" >> .env
+
+    - name: Wait for MySQL
+      run: |
+        until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -prootpass --silent; do
+          echo 'Waiting for MySQL...'
+          sleep 2
+        done
+
+    - name: Run database migrations
+      run: yarn db:migrate --skip-generate
+      env:
+        DATABASE_URL: mysql://root:rootpass@localhost:3306/real_blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+
+    - name: Build Next.js app
+      run: yarn build
+      env:
+        DATABASE_URL: mysql://root:rootpass@localhost:3306/real_blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+        PRIVATE_JWK: '{"kty":"RSA","n":"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ","e":"AQAB","d":"SCVv-bUuujlnPpcHQpnPosLzniFATFm8zelU5l3L1WZBh9w0F5zPZJYE0P8e5X8ur67oDlJM-n--nI-I0yXj2lygY1pC98Q1pRllrt0HsvmindCLvzYz7NW8BsjBKhP4EtvIqLI9fHWeKrjlaDghxoLwNmhqs1DxgOYiqhYQrma2wvMwh6n7J6qRFyxxz3J1wVoSuq4rirVM4BQMA9_qDhHdpttcvf_fkIJ3xAcnFx1dE7brRzukqjlhSUH0VQ1X3GQQwdBYSgdO5Nfg0-SmMr2ctaYOJn9rWQFechatk7EgEcJtL_Lkz-aHy9RE_Kymfyq1wdmu5dwHU0ARfdbqDQ","p":"_bRV64t9R_9aiVK1jkBnmRvxy3jOwKCb52V5rg47sF_1FMV4xK5KdyClDNY_Mc0HYwl3OdQcWOhol1qmTiKtXjsMgEzhMCKZr9iXHSX3hckIOI4o0p3yWCM34kyjiHaycRCPL_Q_NGBTp-5qLWJ0dtN2u5uXvI5BKd5aLSPOKFc","q":"z5JLq528W1_lSSNFtb03wYpiYMbGlKjbfEOtidesU97n-UjaYh8g2ZeNaLehK_OVRcMdLAs2ohfT8rb5zQakHncVK_bojAgbmYQRwaEgncEcZyKsw03gvNrvePYsG91iSXiXPku_yTeQiM_YYheEQdzWF3y0KLLphdpIM-zd1oM","dp":"oYBF3a6rLsTf5mDvUEGxcSb30hXyT28uL6xKPEG1P36mLfXS_ikRICp4xuYvzkz9Mc9ZxUdAUFyKECdVjJHImR6vw5CtHQ45lVYkRBriKZkikZX1aLXBCthIf9dXlswwpYbsD5PFFFtphZJgpslw6B-PCrhubEqGMtfnwap0Vvs","dq":"AZSYlObvjzaMtWDaYAbfzM5z7060Jl-exDRzts_4lO7mj0RZvVOFWYLI5do4FPCW22Af8bzoHpXV3Ew-XKxHRaAcfig0HxTUuPeDdxj1-Z2FzNc7v4TxSB7WofIl5dRqsiqD5EqJXEvbAt-qQxzwudunmaguavzpwEYoNJUCH2c","qi":"4d-Ct9yJ8SvRldlfeLHvlxIxtjnnMRhc0GPitnxpquWnTBEnNt7AHdtpn2vR7C4GB0pRpmrPw99MgQK92vcanAZlELvz5uH77-w909YpxJuYU7wyo7s9GXeU7HYk7ShKLUWYx9eynnKKlYo-sF_LVqsIspyvGOCzxYchEN6YlKQ"}'
+        PUBLIC_JWK: '{"kty":"RSA","n":"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ","e":"AQAB"}'
+
+    - name: Start application
+      run: |
+        yarn start &
+        npx wait-on http://localhost:3000 --timeout 60000
+      env:
+        DATABASE_URL: mysql://root:rootpass@localhost:3306/real_blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+        PRIVATE_JWK: '{"kty":"RSA","n":"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ","e":"AQAB","d":"SCVv-bUuujlnPpcHQpnPosLzniFATFm8zelU5l3L1WZBh9w0F5zPZJYE0P8e5X8ur67oDlJM-n--nI-I0yXj2lygY1pC98Q1pRllrt0HsvmindCLvzYz7NW8BsjBKhP4EtvIqLI9fHWeKrjlaDghxoLwNmhqs1DxgOYiqhYQrma2wvMwh6n7J6qRFyxxz3J1wVoSuq4rirVM4BQMA9_qDhHdpttcvf_fkIJ3xAcnFx1dE7brRzukqjlhSUH0VQ1X3GQQwdBYSgdO5Nfg0-SmMr2ctaYOJn9rWQFechatk7EgEcJtL_Lkz-aHy9RE_Kymfyq1wdmu5dwHU0ARfdbqDQ","p":"_bRV64t9R_9aiVK1jkBnmRvxy3jOwKCb52V5rg47sF_1FMV4xK5KdyClDNY_Mc0HYwl3OdQcWOhol1qmTiKtXjsMgEzhMCKZr9iXHSX3hckIOI4o0p3yWCM34kyjiHaycRCPL_Q_NGBTp-5qLWJ0dtN2u5uXvI5BKd5aLSPOKFc","q":"z5JLq528W1_lSSNFtb03wYpiYMbGlKjbfEOtidesU97n-UjaYh8g2ZeNaLehK_OVRcMdLAs2ohfT8rb5zQakHncVK_bojAgbmYQRwaEgncEcZyKsw03gvNrvePYsG91iSXiXPku_yTeQiM_YYheEQdzWF3y0KLLphdpIM-zd1oM","dp":"oYBF3a6rLsTf5mDvUEGxcSb30hXyT28uL6xKPEG1P36mLfXS_ikRICp4xuYvzkz9Mc9ZxUdAUFyKECdVjJHImR6vw5CtHQ45lVYkRBriKZkikZX1aLXBCthIf9dXlswwpYbsD5PFFFtphZJgpslw6B-PCrhubEqGMtfnwap0Vvs","dq":"AZSYlObvjzaMtWDaYAbAbfzM5z7060Jl-exDRzts_4lO7mj0RZvVOFWYLI5do4FPCW22Af8bzoHpXV3Ew-XKxHRaAcfig0HxTUuPeDdxj1-Z2FzNc7v4TxSB7WofIl5dRqsiqD5EqJXEvbAt-qQxzwudunmaguavzpwEYoNJUCH2c","qi":"4d-Ct9yJ8SvRldlfeLHvlxIxtjnnMRhc0GPitnxpquWnTBEnNt7AHdtpn2vR7C4GB0pRpmrPw99MgQK92vcanAZlELvz5uH77-w909YpxJuYU7wyo7s9GXeU7HYk7ShKLUWYx9eynnKKlYo-sF_LVqsIspyvGOCzxYchEN6YlKQ"}'
+        PUBLIC_JWK: '{"kty":"RSA","n":"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ","e":"AQAB"}'
+
+    - name: Run Playwright tests
+      run: npx playwright test
+      env:
+        DATABASE_URL: mysql://root:rootpass@localhost:3306/real_blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+        PRIVATE_JWK: '{"kty":"RSA","n":"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ","e":"AQAB","d":"SCVv-bUuujlnPpcHQpnPosLzniFATFm8zelU5l3L1WZBh9w0F5zPZJYE0P8e5X8ur67oDlJM-n--nI-I0yXj2lygY1pC98Q1pRllrt0HsvmindCLvzYz7NW8BsjBKhP4EtvIqLI9fHWeKrjlaDghxoLwNmhqs1DxgOYiqhYQrma2wvMwh6n7J6qRFyxxz3J1wVoSuq4rirVM4BQMA9_qDhHdpttcvf_fkIJ3xAcnFx1dE7brRzukqjlhSUH0VQ1X3GQQwdBYSgdO5Nfg0-SmMr2ctaYOJn9rWQFechatk7EgEcJtL_Lkz-aHy9RE_Kymfyq1wdmu5dwHU0ARfdbqDQ","p":"_bRV64t9R_9aiVK1jkBnmRvxy3jOwKCb52V5rg47sF_1FMV4xK5KdyClDNY_Mc0HYwl3OdQcWOhol1qmTiKtXjsMgEzhMCKZr9iXHSX3hckIOI4o0p3yWCM34kyjiHaycRCPL_Q_NGBTp-5qLWJ0dtN2u5uXvI5BKd5aLSPOKFc","q":"z5JLq528W1_lSSNFtb03wYpiYMbGlKjbfEOtidesU97n-UjaYh8g2ZeNaLehK_OVRcMdLAs2ohfT8rb5zQakHncVK_bojAgbmYQRwaEgncEcZyKsw03gvNrvePYsG91iSXiXPku_yTeQiM_YYheEQdzWF3y0KLLphdpIM-zd1oM","dp":"oYBF3a6rLsTf5mDvUEGxcSb30hXyT28uL6xKPEG1P36mLfXS_ikRICp4xuYvzkz9Mc9ZxUdAUFyKECdVjJHImR6vw5CtHQ45lVYkRBriKZkikZX1aLXBCthIf9dXlswwpYbsD5PFFFtphZJgpslw6B-PCrhubEqGMtfnwap0Vvs","dq":"AZSYlObvjzaMtWDaYAbfzM5z7060Jl-exDRzts_4lO7mj0RZvVOFWYLI5do4FPCW22Af8bzoHpXV3Ew-XKxHRaAcfig0HxTUuPeDdxj1-Z2FzNc7v4TxSB7WofIl5dRqsiqD5EqJXEvbAt-qQxzwudunmaguavzpwEYoNJUCH2c","qi":"4d-Ct9yJ8SvRldlfeLHvlxIxtjnnMRhc0GPitnxpquWnTBEnNt7AHdtpn2vR7C4GB0pRpmrPw99MgQK92vcanAZlELvz5uH77-w909YpxJuYU7wyo7s9GXeU7HYk7ShKLUWYx9eynnKKlYo-sF_LVqsIspyvGOCzxYchEN6YlKQ"}'
+        PUBLIC_JWK: '{"kty":"RSA","n":"zbXNUF8ThI0b1UGtZhEQyne2UzVSKIqnqbqZUXUulH0hmo4Mt5qXYHq1YKnTkUUW1K5TCLmL17vwUk8o8ErsXfaE31zWFtK3_LFMcOCb7Ya6aqrkV6czXhOLjMzjdp4zmVp3VauIoknfR_6qN_7GWOi4GU_WEyFu8Nwe4EyRr7KPFyO3sU-tey33Nl5yVV5HXkbxMYx4UyeHAUBj_cjlpm6cQk36rcuElLZ3XTFQ-v1b58RKOvP_Pi9TFtF5lj3Lb7d0TsKB_7CbnZQpXUTp1BKvnAPtZyANi-C3EB_zvo3WWz79GzWKVo-61_G7bNjqAR4XB6w72zBspFiFr1JehQ","e":"AQAB"}'
+
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-times: 7

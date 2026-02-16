@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-hook-form/dist/watch.d.ts b/node_modules/react-hook-form/dist/watch.d.ts
+index c5137b2..eab78bd 100644
+--- a/node_modules/react-hook-form/dist/watch.d.ts
++++ b/node_modules/react-hook-form/dist/watch.d.ts
+@@ -25,5 +25,5 @@ import type { FieldPath, FieldValues, WatchProps } from './types';
+  * />
+  * ```
+  */
+-export declare const Watch: <TFieldValues extends FieldValues = FieldValues, const TFieldName extends FieldPath<TFieldValues> | FieldPath<TFieldValues>[] | readonly FieldPath<TFieldValues>[] | undefined = undefined, TContext = any, TTransformedValues = TFieldValues, TComputeValue = undefined>(props: WatchProps<TFieldName, TFieldValues, TContext, TTransformedValues, TComputeValue>) => import("react").ReactNode | import("react").ReactNode[];
++export declare const Watch: <TFieldValues extends FieldValues = FieldValues, TFieldName extends FieldPath<TFieldValues> | FieldPath<TFieldValues>[] | readonly FieldPath<TFieldValues>[] | undefined = undefined, TContext = any, TTransformedValues = TFieldValues, TComputeValue = undefined>(props: WatchProps<TFieldName, TFieldValues, TContext, TTransformedValues, TComputeValue>) => import("react").ReactNode | import("react").ReactNode[];
+ //# sourceMappingURL=watch.d.ts.map
+\ No newline at end of file

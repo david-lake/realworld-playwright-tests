@@ -1,11 +1,14 @@
-import { NextSeo, NextSeoProps } from 'next-seo';
+import { NextSeo } from 'next-seo';
+import type { NextSeoProps } from 'next-seo';
 import { ReactNode } from 'react';
 import { useMessageHandler } from '../../lib/hooks/use-message';
 import LoadingSpinner from './LoadingSpinner';
 
 type WrapperProps = {
   children: ReactNode;
-} & NextSeoProps;
+  title?: string;
+  description?: string;
+} & Omit<NextSeoProps, 'children'>;
 
 export default function Wrapper({ children, ...props }: WrapperProps) {
   const { dismissing } = useMessageHandler();

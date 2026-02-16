@@ -32,7 +32,7 @@ const Article = objectType({
             where: { slug },
           })
           .favoritedBy({ select: { favoritedBy: true }, where: { userId: context.currentUser.id } });
-        return !!favorites.length;
+        return (favorites?.length ?? 0) > 0;
       },
     });
     t.nonNull.list.nonNull.string('tagList', {
@@ -42,7 +42,7 @@ const Article = objectType({
             where: { slug },
           })
           .tags({ select: { tag: { select: { name: true } } } });
-        return tags.map((t) => t.tag.name);
+        return tags?.map((t) => t.tag.name) ?? [];
       },
     });
   },
