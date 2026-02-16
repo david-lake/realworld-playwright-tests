@@ -70,6 +70,9 @@ jobs:
 
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+        DATABASE_URL: mysql://root:rootpass@localhost:3306/real_blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+        PRIVATE_JWK: '{"kty":"RSA","n":"test-key-for-ci","e":"AQAB","d":"test","p":"test","q":"test","dp":"test","dq":"test","qi":"test"}'
 
     - name: Upload Playwright report
       uses: actions/upload-artifact@v4
