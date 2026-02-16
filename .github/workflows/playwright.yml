@@ -30,7 +30,8 @@ jobs:
       run: corepack enable
 
     - name: Install dependencies
-      run: yarn install --immutable
+      run: yarn install --immutable --inline-builds --verbose
+
       env:
         CI: true
         PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
